@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IP地址和位置</title>
+</head>
+<body>
+    <h1>欢迎访问本网站！</h1>
+    <p>您的IP地址：<span id="ip-address">正在获取...</span></p>
+    <p>您的位置：<span id="location">正在获取...</span></p>
+
+    <script>
+        // 使用IP地址查询API获取IP地址和位置
+        fetch('https://api.ip.sb/geoip') // 使用api.ip.sb API
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('ip-address').textContent = data.ip;
+                document.getElementById('location').textContent = `${data.country}, ${data.region}, ${data.city}`;
+                // 可选：将IP地址和位置发送到后端记录
+                logIP(data.ip, `${data.country}, ${data.region}, ${data.city}`);
+            })
+            .catch(error => {
+                console.error('获取IP地址和位置失败:', error);
+                document.getElementById('ip-address').textContent = '获取失败';
+                document.getElementById('location').textContent = '获取失败';
+            });
+
+        function logIP(ip, location) {
+            fetch('/log_ip.php', { // 替换为你的后端记录IP的地址
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ip: ip, location: location })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('IP地址和位置记录成功');
+                } else {
+                    console.error('IP地址和位置记录失败');
+                }
+            })
+            .catch(error => {
+                console.error('IP地址和位置记录失败:', error);
+            });
+        }
+    </script>
+</body>
+</html>
